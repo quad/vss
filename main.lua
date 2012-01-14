@@ -1,8 +1,7 @@
 x, y = 400, 300
 
-
 joystick = {
-    n = 0, 
+    n = 0,
     axes = {
         lr = 0,
         ud = 1
@@ -12,11 +11,38 @@ joystick = {
 }
 
 debug = {}
-
 bullets = {}
+baddies = {}
+
+-- Bad guys
+Bad = {}
+
+function Bad:new()
+    return setmetatable({x = 50, y = 50, state = "enter"}, {__index = self})
+end
+
+function Bad:update(dt)
+end
+
+function Bad:draw()
+    local size = 20
+
+    love.graphics.triangle(
+        'line',
+        self.x, self.y + (size / 2),
+        self.x + (size / 2), self.y - (size / 2),
+        self.x - (size / 2), self.y - (size / 2)
+    )
+end
+-- end
 
 function love.load(arg)
     love.joystick.open(joystick.n)
+    add_bad()
+end
+
+function add_bad()
+    table.insert(baddies, Bad:new{})
 end
 
 function axis_update(joystick, axis)
@@ -61,7 +87,7 @@ end
 function love.keypressed(k)
     if k == 'escape' or k == 'q' then
         love.event.push('q')
-    end 
+    end
 end
 
 function draw_ship(x, y)
@@ -73,7 +99,7 @@ end
 
 
 function draw_bullets()
-    for i,v in ipairs(bullets) do 
+    for i,v in ipairs(bullets) do
         love.graphics.circle('fill', v.x, v.y, 10)
     end
 end
@@ -81,6 +107,10 @@ end
 function love.draw()
     draw_ship(x, y)
     draw_bullets()
+
+    for i, v in ipairs(baddies) do
+        v:draw()
+    end
 
     -- DEBUG
     for i = 1, #debug do
