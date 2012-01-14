@@ -1,6 +1,7 @@
 require 'bad'
-require 'ship'
+require 'boom'
 require 'bullet'
+require 'ship'
 
 joystick = {
     n = 0,
@@ -13,13 +14,22 @@ joystick = {
 }
 
 debug = {}
+
+ships = {}
 bullets = {}
 baddies = {}
+booms = {}
+
+live = {ships, bullets, baddies}
+all = {ships, bullets, baddies, booms}
 
 function love.load(arg)
     love.joystick.open(joystick.n)
+
     ship = Ship:new(400, 300, joystick)
-    for i=1,1000,1 do
+    table.insert(ships, ship)
+
+    for i = 1, 1000, 1 do
         table.insert(baddies, Bad:new(math.random() * 500, math.random() * 50))
     end
 end
@@ -35,69 +45,59 @@ function love.joystickreleased(j, b)
     fire_everything = false
 end
 
-function delete_offscreen_bullets()
-    local trash = {}
-
-    for i, v in ipairs(bullets) do
-        if v:is_offscreen() then
-            table.insert(trash, i, 1)
-        end
-    end
-
-    for i, v in ipairs(trash) do
-        table.remove(bullets, v)
-    end
-end
-
-function update_fire_state(dt)
+function update_fire_state()
     if fire_everything then
         table.insert(bullets, Bullet:new(ship.x, ship.y, "player"))
     end
 end
 
-function destroy_baddies()
-    local trash = {}
+function is_colliding(a, b)
+    local abs_x = a.x - b.x
+    local abs_y = a.y - b.y
+    -- LOSING
+    return math.abs(abs_x) < a.radius and math.abs(abs_y) < a.radius
+    -- WINNING
+    -- distance = math.sqrt(abs_x * abs_x + abs_y * abs_y)
+    -- return distance < a.radius
+end
 
-    for i,bad in ipairs(baddies) do 
-        for ib,bullet in ipairs(bullets) do
-            if bullet:hits(bad) then
-                local responded = bad:hit(bullet)
+function collision_detection()
+    for i_bad, bad in ipairs(baddies) do
+        for i_bullet, bullet in ipairs(bullets) do
+            if is_colliding(bullet, bad) then
+                bad:collide(bullet)
 
-                if responded then
-                    table.insert(trash, ib, 1)
-                    break
+                if bad.dead then
+                    table.remove(baddies, i_bad)
+                    table.insert(booms, Boom:new(bad.x, bad.y))
                 end
+
+                table.remove(bullets, i_bullet)
             end
         end
     end
+end
 
-    for i, v in ipairs(trash) do
-        table.remove(bullets, v)
-    end
+function update()
+    update_fire_state()
+    collision_detection()
 end
 
 function advance(dt)
-    for i, things in ipairs({{ship}, bullets, baddies}) do
-        for i, t in ipairs(things) do
+    for i_things, things in ipairs(all) do
+        for i_t, t in ipairs(things) do
             t:advance(dt)
+
+            if t.dead then
+                table.remove(things, i_t)
+            end
         end
     end
 end
 
-function update(dt)
-    update_fire_state(dt)
-
-    destroy_baddies()
-end
-
-function clean()
-    delete_offscreen_bullets()
-end
-
 function love.update(dt)
-    update(dt)
     advance(dt)
-    clean()
+    update(dt)
 end
 
 function love.keypressed(k)
@@ -107,7 +107,7 @@ function love.keypressed(k)
 end
 
 function love.draw()
-    for i, things in ipairs({{ship}, bullets, baddies}) do
+    for i, things in ipairs(all) do
         for i, t in ipairs(things) do
             t:draw()
         end
