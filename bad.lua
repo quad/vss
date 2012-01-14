@@ -8,7 +8,7 @@ function Bad:new(x, y)
     }, {__index = self})
 end
 
-function Bad:update(dt)
+function Bad:advance(dt)
     if self.state == "dying" then
         self.death_duration = self.death_duration - dt
 

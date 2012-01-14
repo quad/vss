@@ -65,17 +65,24 @@ function destroy_baddies()
     end
 end
 
-function love.update(dt)
+function advance(dt)
+    for i, things in ipairs({{ship}, bullets, baddies}) do
+        for i, t in ipairs(things) do
+            t:advance(dt)
+        end
+    end
+end
+
+function update(dt)
     update_fire_state(dt)
     delete_offscreen_bullets()
 
     destroy_baddies()
+end
 
-    for i, things in ipairs({{ship}, bullets, baddies}) do
-        for i, t in ipairs(things) do
-            t:update(dt)
-        end
-    end
+function love.update(dt)
+    update(dt)
+    advance(dt)
 end
 
 function love.keypressed(k)

@@ -18,7 +18,7 @@ function axis_update(joystick, axis)
     end
 end
 
-function Ship:update(dt)
+function Ship:advance(dt)
     self.x = self.x + axis_update(joystick, 'lr') * dt
     self.y = self.y + axis_update(joystick, 'ud') * dt
 end

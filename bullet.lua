@@ -10,7 +10,7 @@ function Bullet:new(x, y, fired_by)
         r = 0}, {__index = self})
 end
 
-function Bullet:update(dt)
+function Bullet:advance(dt)
     self.x = self.x + self.v * math.sin(self.r) * dt
     self.y = self.y - self.v * math.cos(self.r) * dt
 end
