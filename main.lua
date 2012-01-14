@@ -1,31 +1,40 @@
 x, y = 400, 300
 
-joystick = 0
-joystick_axis_lr = 0
-joystick_axis_ud = 1
-joystick_sensitivity = 500
-joystick_threshold = 0.25
+
+joystick = {
+    n = 0, 
+    axes = {
+        lr = 0,
+        ud = 1
+    },
+    sensitivity = 500,
+    threshold = 0.25
+}
 
 debug = {}
 
 bullets = {}
 
 function love.load(arg)
-    love.joystick.open(joystick)
+    love.joystick.open(joystick.n)
 end
 
 function axis_update(joystick, axis)
-    delta = love.joystick.getAxis(joystick, axis)
+    delta = love.joystick.getAxis(joystick.n, joystick.axes[axis])
 
-    if math.abs(delta) > joystick_threshold then
-        return joystick_sensitivity * delta
+    if math.abs(delta) > joystick.threshold then
+        return joystick.sensitivity * delta
     else
         return 0
     end
 end
 
 function love.joystickpressed(j, b)
-    table.insert(bullets, {x=x, y=y, v=1000, r=0})
+    fire_everything = true
+end
+
+function love.joystickreleased(j, b)
+    fire_everything = false
 end
 
 function update_bullets(dt)
@@ -35,11 +44,18 @@ function update_bullets(dt)
     end
 end
 
+function update_fire_state(dt)
+    if fire_everything then
+        table.insert(bullets, {x=x, y=y, v=1000, r=0})
+    end
+end
+
 function love.update(dt)
+    update_fire_state(dt)
     update_bullets(dt)
 
-    x = x + axis_update(joystick, joystick_axis_lr) * dt
-    y = y + axis_update(joystick, joystick_axis_ud) * dt
+    x = x + axis_update(joystick, 'lr') * dt
+    y = y + axis_update(joystick, 'ud') * dt
 end
 
 function love.keypressed(k)
