@@ -56,12 +56,23 @@ function update_fire_state(dt)
 end
 
 function destroy_baddies()
+    local trash = {}
+
     for i,bad in ipairs(baddies) do 
-        for i,bullet in ipairs(bullets) do
+        for ib,bullet in ipairs(bullets) do
             if bullet:hits(bad) then
-                bad:hit(bullet)
+                local responded = bad:hit(bullet)
+
+                if responded then
+                    table.insert(trash, ib, 1)
+                    break
+                end
             end
         end
+    end
+
+    for i, v in ipairs(trash) do
+        table.remove(bullets, v)
     end
 end
 
@@ -75,14 +86,18 @@ end
 
 function update(dt)
     update_fire_state(dt)
-    delete_offscreen_bullets()
 
     destroy_baddies()
+end
+
+function clean()
+    delete_offscreen_bullets()
 end
 
 function love.update(dt)
     update(dt)
     advance(dt)
+    clean()
 end
 
 function love.keypressed(k)

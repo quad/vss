@@ -19,8 +19,12 @@ function Bad:advance(dt)
 end
 
 function Bad:hit(bullet)
-    self.state = "dying"
-    self.death_duration = 1
+    if self.state == "enter" then
+        self.state = "dying"
+        self.death_duration = 1
+
+        return true
+    end
 end
 
 function Bad:draw()
