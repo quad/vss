@@ -28,13 +28,22 @@ function love.joystickpressed(j, b)
     table.insert(bullets, {x=x, y=y, v=1, r=0})
 end
 
+function update_bullets(dt)
+    for i, v in ipairs(bullets) do
+        v.x = v.x + v.v * math.sin(v.r)
+        v.y = v.y - v.v * math.cos(v.r)
+    end
+end
+
 function love.update(dt)
+    update_bullets(dt)
+
     x = x + axis_update(joystick, joystick_axis_lr) * dt
     y = y + axis_update(joystick, joystick_axis_ud) * dt
 end
 
 function love.keypressed(k)
-    if k == 'escape' then
+    if k == 'escape' or k == 'q' then
         love.event.push('q')
     end 
 end
