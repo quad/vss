@@ -29,8 +29,8 @@ function love.load(arg)
     ship = Ship:new(400, 300, joystick)
     table.insert(ships, ship)
 
-    for i = 1, 1000, 1 do
-        table.insert(baddies, Bad:new(math.random() * 500, math.random() * 50))
+    for i = 1, 100, 1 do
+        table.insert(baddies, Bad:new(math.random() * 700 + 25, math.random() * 100))
     end
 end
 
@@ -96,6 +96,7 @@ function advance(dt)
 end
 
 function love.update(dt)
+    dt = math.min(dt, 1.0 / 60.0)
     advance(dt)
     update(dt)
 end
