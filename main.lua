@@ -117,4 +117,7 @@ function love.draw()
     for i = 1, #debug do
         love.graphics.print("Line " .. i .. ": " .. debug[i], 50, 50 + (i * 10))
     end
+
+    -- Draw the current FPS.
+    love.graphics.print("FPS: " .. love.timer.getFPS(), 0, love.graphics.getHeight() - 15)
 end
