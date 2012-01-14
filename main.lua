@@ -4,27 +4,32 @@ joystick = 0
 joystick_axis_lr = 0
 joystick_axis_ud = 1
 joystick_sensitivity = 500
+joystick_threshold = 0.25
 
-debug = {'lulz'}
+debug = {}
 
 function love.load(arg)
     love.joystick.open(joystick)
 end
 
-function love.update(dt)
-    -- left and 
-    debug = {
-        love.joystick.getAxis(joystick, 0),
-        love.joystick.getAxis(joystick, 1)
-    }
+function axis_update(joystick, axis)
+    delta = love.joystick.getAxis(joystick, axis)
 
-    x = x + (joystick_sensitivity * love.joystick.getAxis(joystick, joystick_axis_lr)) * dt
-    y = y + (joystick_sensitivity * love.joystick.getAxis(joystick, joystick_axis_ud)) * dt
+    if math.abs(delta) > joystick_threshold then
+        return joystick_sensitivity * delta
+    else
+        return 0
+    end
+end
+
+function love.update(dt)
+    x = x + axis_update(joystick, joystick_axis_lr) * dt
+    y = y + axis_update(joystick, joystick_axis_ud) * dt
 end
 
 function love.keypressed(k)
     if k == 'escape' then
-        love.event.push('q') -- quit the game
+        love.event.push('q')
     end 
 end
 
@@ -38,7 +43,7 @@ end
 function love.draw()
     draw_ship(x, y)
 
-    -- Draw the loaded lines.
+    -- DEBUG
     for i = 1, #debug do
         love.graphics.print("Line " .. i .. ": " .. debug[i], 50, 50 + (i * 10))
     end
