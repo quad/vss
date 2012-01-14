@@ -19,11 +19,12 @@ baddies = {}
 function love.load(arg)
     love.joystick.open(joystick.n)
     ship = Ship:new(400, 300, joystick)
-    add_bad()
+    for i=1,1000,1 do
+        table.insert(baddies, Bad:new(math.random() * 500, math.random() * 50))
+    end
 end
 
 function add_bad()
-    table.insert(baddies, Bad:new{})
 end
 
 function love.joystickpressed(j, b)
