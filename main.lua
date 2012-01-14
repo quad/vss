@@ -25,13 +25,13 @@ function axis_update(joystick, axis)
 end
 
 function love.joystickpressed(j, b)
-    table.insert(bullets, {x=x, y=y, v=1, r=0})
+    table.insert(bullets, {x=x, y=y, v=1000, r=0})
 end
 
 function update_bullets(dt)
     for i, v in ipairs(bullets) do
-        v.x = v.x + v.v * math.sin(v.r)
-        v.y = v.y - v.v * math.cos(v.r)
+        v.x = v.x + v.v * math.sin(v.r) * dt
+        v.y = v.y - v.v * math.cos(v.r) * dt
     end
 end
 
