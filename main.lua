@@ -54,9 +54,21 @@ function update_fire_state(dt)
     end
 end
 
+function destroy_baddies()
+    for i,bad in ipairs(baddies) do 
+        for i,bullet in ipairs(bullets) do
+            if bullet:hits(bad) then
+                table.insert(debug, "hit!")
+            end
+        end
+    end
+end
+
 function love.update(dt)
     update_fire_state(dt)
     delete_offscreen_bullets()
+
+    destroy_baddies()
 
     for i, things in ipairs({{ship}, bullets, baddies}) do
         for i, t in ipairs(things) do
