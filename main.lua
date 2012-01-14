@@ -119,5 +119,16 @@ function love.draw()
     end
 
     -- Draw the current FPS.
+    print_objects(0, love.graphics.getHeight() - 30, 'All', all)
+    print_objects(0, love.graphics.getHeight() - 45, 'Live', live)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 0, love.graphics.getHeight() - 15)
+end
+
+function print_objects(x, y, title, objs)
+    local n = 0
+    for i, v in ipairs(objs) do
+        n = n + table.maxn(v)
+    end
+
+    love.graphics.print(title .. ":" .. n, x, y)
 end
