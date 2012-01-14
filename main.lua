@@ -8,6 +8,8 @@ joystick_threshold = 0.25
 
 debug = {}
 
+bullets = {}
+
 function love.load(arg)
     love.joystick.open(joystick)
 end
@@ -20,6 +22,10 @@ function axis_update(joystick, axis)
     else
         return 0
     end
+end
+
+function love.joystickpressed(j, b)
+    table.insert(bullets, {x=x, y=y, v=1, r=0})
 end
 
 function love.update(dt)
@@ -40,8 +46,16 @@ function draw_ship(x, y)
     love.graphics.point(x, y, 1)
 end
 
+
+function draw_bullets()
+    for i,v in ipairs(bullets) do 
+        love.graphics.circle('fill', v.x, v.y, 10)
+    end
+end
+
 function love.draw()
     draw_ship(x, y)
+    draw_bullets()
 
     -- DEBUG
     for i = 1, #debug do
