@@ -16,10 +16,13 @@ function Bad:advance(dt)
     self.x = self.rail.x
     self.y = self.rail.y
     self.dead = self.rail.dead 
+    self.shots = self.rail.shots
 end
 
 function Bad:collide(bullet)
-    self.dead = true
+    if bullet.deadly then
+        self.dead = true
+    end
 end
 
 function Bad:draw()

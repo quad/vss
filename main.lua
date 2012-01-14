@@ -45,9 +45,17 @@ function love.joystickreleased(j, b)
     fire_everything = false
 end
 
-function update_fire_state()
+function update_bullets()
     if fire_everything then
-        table.insert(bullets, Bullet:new(ship.x, ship.y, "player"))
+        table.insert(bullets, Bullet:new(ship.x, ship.y, 0, true))
+    end
+
+    for i_bad, bad in ipairs(baddies) do
+        for i_s, s in ipairs(bad.shots) do
+            table.insert(bullets, s)
+        end
+
+        bad.shots = {}
     end
 end
 
@@ -55,10 +63,10 @@ function is_colliding(a, b)
     local abs_x = a.x - b.x
     local abs_y = a.y - b.y
     -- LOSING
-    return math.abs(abs_x) < a.radius and math.abs(abs_y) < a.radius
+    -- return math.abs(abs_x) < a.radius and math.abs(abs_y) < a.radius
     -- WINNING
-    -- distance = math.sqrt(abs_x * abs_x + abs_y * abs_y)
-    -- return distance < a.radius
+    distance = math.sqrt(abs_x * abs_x + abs_y * abs_y)
+    return distance < a.radius
 end
 
 function collision_detection()
@@ -79,7 +87,7 @@ function collision_detection()
 end
 
 function update()
-    update_fire_state()
+    update_bullets()
     collision_detection()
 end
 
@@ -97,6 +105,7 @@ end
 
 function love.update(dt)
     dt = math.min(dt, 1.0 / 60.0)
+
     advance(dt)
     update(dt)
 end

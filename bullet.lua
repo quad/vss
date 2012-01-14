@@ -1,19 +1,19 @@
 Bullet = {}
 
-function Bullet:new(x, y, fired_by)
+function Bullet:new(x, y, theta, deadly)
     return setmetatable({
         x = x,
         y = y,
         dead = false,
-        fired_by = fired_by,
-        radius = 10,
+        deadly = deadly or false,
+        radius = 5,
         v = 1000,
-        r = 0}, {__index = self})
+        theta = theta or math.pi}, {__index = self})
 end
 
 function Bullet:advance(dt)
-    self.x = self.x + self.v * math.sin(self.r) * dt
-    self.y = self.y - self.v * math.cos(self.r) * dt
+    self.x = self.x + self.v * math.sin(self.theta) * dt
+    self.y = self.y - self.v * math.cos(self.theta) * dt
 
     if self:is_offscreen() then
         self.dead = true
