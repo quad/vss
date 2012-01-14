@@ -11,6 +11,10 @@ end
 function Bad:update(dt)
 end
 
+function Bad:hit(bullet)
+    table.insert(debug, "hit!")
+end
+
 function Bad:draw()
     local size = 20
 

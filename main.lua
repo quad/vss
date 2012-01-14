@@ -58,7 +58,7 @@ function destroy_baddies()
     for i,bad in ipairs(baddies) do 
         for i,bullet in ipairs(bullets) do
             if bullet:hits(bad) then
-                table.insert(debug, "hit!")
+                bad:hit(bullet)
             end
         end
     end
