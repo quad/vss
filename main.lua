@@ -1,4 +1,6 @@
-x, y = 400, 300
+require 'bad'
+require 'ship'
+require 'bullet'
 
 joystick = {
     n = 0,
@@ -14,45 +16,14 @@ debug = {}
 bullets = {}
 baddies = {}
 
--- Bad guys
-Bad = {}
-
-function Bad:new()
-    return setmetatable({x = 50, y = 50, state = "enter"}, {__index = self})
-end
-
-function Bad:update(dt)
-end
-
-function Bad:draw()
-    local size = 20
-
-    love.graphics.triangle(
-        'line',
-        self.x, self.y + (size / 2),
-        self.x + (size / 2), self.y - (size / 2),
-        self.x - (size / 2), self.y - (size / 2)
-    )
-end
--- end
-
 function love.load(arg)
     love.joystick.open(joystick.n)
+    ship = Ship:new(400, 300, joystick)
     add_bad()
 end
 
 function add_bad()
     table.insert(baddies, Bad:new{})
-end
-
-function axis_update(joystick, axis)
-    delta = love.joystick.getAxis(joystick.n, joystick.axes[axis])
-
-    if math.abs(delta) > joystick.threshold then
-        return joystick.sensitivity * delta
-    else
-        return 0
-    end
 end
 
 function love.joystickpressed(j, b)
@@ -64,24 +35,35 @@ function love.joystickreleased(j, b)
 end
 
 function update_bullets(dt)
+    local trash = {}
+
     for i, v in ipairs(bullets) do
-        v.x = v.x + v.v * math.sin(v.r) * dt
-        v.y = v.y - v.v * math.cos(v.r) * dt
+        v:update(dt)
+
+        if v:is_offscreen() then
+            table.insert(trash, i, 1)
+        end
+    end
+
+    for i, v in ipairs(trash) do
+        table.remove(bullets, v)
     end
 end
 
 function update_fire_state(dt)
     if fire_everything then
-        table.insert(bullets, {x=x, y=y, v=1000, r=0})
+        table.insert(bullets, Bullet:new(ship.x, ship.y))
     end
 end
 
 function love.update(dt)
     update_fire_state(dt)
-    update_bullets(dt)
 
-    x = x + axis_update(joystick, 'lr') * dt
-    y = y + axis_update(joystick, 'ud') * dt
+    for i, things in ipairs({{ship}, bullets, baddies}) do
+        for i, t in ipairs(things) do
+            t:update(dt)
+        end
+    end
 end
 
 function love.keypressed(k)
@@ -90,26 +72,12 @@ function love.keypressed(k)
     end
 end
 
-function draw_ship(x, y)
-    local size = 20
-
-    love.graphics.rectangle('line', x - (size / 2), y - (size / 2), size, size)
-    love.graphics.point(x, y, 1)
-end
-
-
-function draw_bullets()
-    for i,v in ipairs(bullets) do
-        love.graphics.circle('fill', v.x, v.y, 10)
-    end
-end
 
 function love.draw()
-    draw_ship(x, y)
-    draw_bullets()
-
-    for i, v in ipairs(baddies) do
-        v:draw()
+    for i, things in ipairs({{ship}, bullets, baddies}) do
+        for i, t in ipairs(things) do
+            t:draw()
+        end
     end
 
     -- DEBUG
