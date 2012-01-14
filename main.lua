@@ -34,12 +34,10 @@ function love.joystickreleased(j, b)
     fire_everything = false
 end
 
-function update_bullets(dt)
+function delete_offscreen_bullets()
     local trash = {}
 
     for i, v in ipairs(bullets) do
-        v:update(dt)
-
         if v:is_offscreen() then
             table.insert(trash, i, 1)
         end
@@ -52,12 +50,13 @@ end
 
 function update_fire_state(dt)
     if fire_everything then
-        table.insert(bullets, Bullet:new(ship.x, ship.y))
+        table.insert(bullets, Bullet:new(ship.x, ship.y, "player"))
     end
 end
 
 function love.update(dt)
     update_fire_state(dt)
+    delete_offscreen_bullets()
 
     for i, things in ipairs({{ship}, bullets, baddies}) do
         for i, t in ipairs(things) do
@@ -71,7 +70,6 @@ function love.keypressed(k)
         love.event.push('q')
     end
 end
-
 
 function love.draw()
     for i, things in ipairs({{ship}, bullets, baddies}) do

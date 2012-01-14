@@ -1,7 +1,11 @@
 Bad = {}
 
 function Bad:new()
-    return setmetatable({x = 50, y = 50, state = "enter"}, {__index = self})
+    return setmetatable({
+        x = 50,
+        y = 50,
+        state = "enter"
+    }, {__index = self})
 end
 
 function Bad:update(dt)

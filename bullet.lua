@@ -1,9 +1,10 @@
 Bullet = {}
 
-function Bullet:new(x, y)
+function Bullet:new(x, y, fired_by)
     return setmetatable({
         x = x,
         y = y,
+        fired_by = fired_by,
         v = 1000,
         r = 0}, {__index = self})
 end
