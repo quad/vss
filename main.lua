@@ -32,6 +32,8 @@ function love.load(arg)
 
     sounds.bad_boom = love.sound.newSoundData("resources/badboom.ogg")
 
+    sounds.ship_boom = love.audio.newSource("resources/shipboom.ogg", "static")
+
     ship = Ship:new(400, 300, joystick)
     table.insert(ships, ship)
 
@@ -101,6 +103,7 @@ function hit_ship()
 
             if ship.dead then
                 table.insert(booms, Boom:new(ship.x, ship.y))
+		sounds.ship_boom:play()
             end
         end
     end
