@@ -11,7 +11,9 @@ function Bad:new(rail)
         dead = false,
         size = 15, 
         rail = r,
-        shots = {}
+        shots = {},
+
+        t = 0
     }, {__index = self})
 end
 
@@ -22,6 +24,8 @@ function Bad:advance(dt)
     self.dead = self.rail.dead 
     self.shots = self.rail.shots
     self.rail.shots = {}
+
+    self.t = self.t + 25 * dt
 end
 
 function Bad:collide(bullet)
@@ -44,11 +48,17 @@ function Bad:draw()
     local half_size = self.size / 2
     local r, g, b, a = love.graphics.getColor()
     love.graphics.setColor(191, 255, 0)
+
+    love.graphics.push()
+    love.graphics.translate(self.x, self.y)
+    love.graphics.rotate(self.t)
     love.graphics.triangle(
         'line',
-        self.x, self.y + half_size,
-        self.x + half_size, self.y - half_size,
-        self.x - half_size, self.y - half_size
+        0, half_size,
+        half_size, - half_size,
+        - half_size, - half_size
     )
+    love.graphics.pop()
+
     love.graphics.setColor(r, g, b, a)
 end
