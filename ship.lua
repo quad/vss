@@ -33,6 +33,7 @@ function Ship:bounds()
 end
 
 function Ship:collide()
+    self.dead = true
 end
 
 function Ship:draw()

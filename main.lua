@@ -99,6 +99,10 @@ function hit_ship()
             if bullet.dead then
                 table.remove(bullets_baddies, i_bullet)
             end
+
+            if ship.dead then
+                table.insert(booms, Boom:new(ship.x, ship.y))
+            end
         end
     end
 end
