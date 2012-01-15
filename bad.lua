@@ -12,7 +12,6 @@ function Bad:new(rail)
         size = 15, 
         rail = r,
         shots = {},
-
         t = 0
     }, {__index = self})
 end
