@@ -7,7 +7,7 @@ function Bad:new(x, y)
         x = x,
         y = y,
         dead = false,
-        size = 20, 
+        size = 15, 
         rail = Rail:new()
     }, {__index = self})
 end
@@ -40,10 +40,13 @@ end
 function Bad:draw()
     local half_size = self.size / 2
 
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor(191, 255, 0)
     love.graphics.triangle(
         'line',
         self.x, self.y + half_size,
         self.x + half_size, self.y - half_size,
         self.x - half_size, self.y - half_size
     )
+    love.graphics.setColor(r, g, b, a)
 end

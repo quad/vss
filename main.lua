@@ -30,15 +30,14 @@ function love.load(arg)
     sounds.player_shot = love.audio.newSource("resources/playershoot.ogg", "static")
     sounds.player_shot:setLooping(true)
 
+    sounds.bad_boom = love.sound.newSoundData("resources/badboom.ogg")
+
     ship = Ship:new(400, 300, joystick)
     table.insert(ships, ship)
 
     for i = 1, 100, 1 do
         table.insert(baddies, Bad:new(math.random() * 700 + 25, math.random() * 100))
     end
-end
-
-function add_bad()
 end
 
 function love.joystickpressed(j, b)
@@ -121,6 +120,9 @@ function hit_baddies()
                 if bad.dead then
                     table.remove(baddies, i_bad)
                     table.insert(booms, Boom:new(bad.x, bad.y))
+
+		    local explosion = love.audio.newSource(sounds.bad_boom)
+		    explosion:play()
                     break
                 end
             end
