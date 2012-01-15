@@ -2,13 +2,15 @@ require 'rail'
 
 Bad = {}
 
-function Bad:new(x, y)
+function Bad:new(rail)
+    local r = rail or SamRail:new(0, 0)
+
     return setmetatable({
-        x = x,
-        y = y,
+        x = r.x,
+        y = r.y,
         dead = false,
         size = 15, 
-        rail = SamRail:new(x, y),
+        rail = r,
         shots = {}
     }, {__index = self})
 end

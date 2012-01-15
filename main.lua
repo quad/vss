@@ -2,6 +2,7 @@ require 'bad'
 require 'boom'
 require 'bullet'
 require 'ship'
+require 'wave'
 
 joystick = {
     n = 0,
@@ -37,8 +38,9 @@ function love.load(arg)
     ship = Ship:new(400, 300, joystick)
     table.insert(ships, ship)
 
-    for i = 1, 100, 1 do
-        table.insert(baddies, Bad:new(math.random() * 700 + 25, math.random() * 100))
+    local w = Wave:new()
+    for _, b in ipairs(w:spawn()) do
+        table.insert(baddies, b)
     end
 end
 
