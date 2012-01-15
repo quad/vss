@@ -16,13 +16,13 @@ joystick = {
 debug = {}
 
 ships = {}
-bullets = {}
+bullets_baddies = {}
+bullets_ship = {}
 baddies = {}
 booms = {}
 sounds = {}
 
-live = {ships, bullets, baddies}
-all = {ships, bullets, baddies, booms}
+all = {ships, bullets_baddies, bullets_ship, baddies, booms}
 
 function love.load(arg)
     love.joystick.open(joystick.n)
@@ -49,53 +49,36 @@ function love.joystickreleased(j, b)
     fire_everything = false
 end
 
-function update_bullets()
-    if fire_everything then
-        if sounds.player_shot:isStopped() then
-            sounds.player_shot:play()
-        end
-        table.insert(bullets, Bullet:new(ship.x, ship.y, 0, true))
-    elseif not sounds.player_shot:isStopped() then
-        sounds.player_shot:stop()
-    end
-
+function fire_baddies()
     for i_bad, bad in ipairs(baddies) do
         for i_s, s in ipairs(bad.shots) do
-            table.insert(bullets, s)
+            table.insert(bullets_baddies, s)
         end
 
         bad.shots = {}
     end
 end
 
-function is_colliding(a, b)
-    local ax2, ay2, bx2, by2 = a.x + a.width, a.y + a.height, b.x + b.width, b.y + b.height
-    return a.x < bx2 and ax2 > b.x and a.y < by2 and ay2 > b.y
-end
-
-function collision_detection()
-    for i_bad, bad in ipairs(baddies) do
-        for i_bullet, bullet in ipairs(bullets) do
-            if is_colliding(bullet:bounds(), bad:bounds()) then
-                bad:collide(bullet)
-
-                if bad.dead then
-                    table.remove(baddies, i_bad)
-                    table.insert(booms, Boom:new(bad.x, bad.y))
-                end
-
-                table.remove(bullets, i_bullet)
-            end
+function fire_ship()
+    if fire_everything then
+        if sounds.player_shot:isStopped() then
+            sounds.player_shot:play()
         end
+        table.insert(bullets_ship, Bullet:new(ship.x, ship.y, 0, true))
+    elseif not sounds.player_shot:isStopped() then
+        sounds.player_shot:stop()
     end
 end
 
-function update()
-    update_bullets()
-    collision_detection()
+function is_colliding(a, b)
+    local bounds_a, bounds_b = a:bounds(), b:bounds()
+
+    local ax2, ay2 = bounds_a.x + bounds_a.width, bounds_a.y + bounds_a.height
+    local bx2, by2 = bounds_b.x + bounds_b.width, bounds_b.y + bounds_b.height
+    return bounds_a.x < bx2 and ax2 > bounds_b.x and bounds_a.y < by2 and ay2 > bounds_b.y
 end
 
-function advance(dt)
+function move(dt)
     for i_things, things in ipairs(all) do
         for i_t, t in ipairs(things) do
             t:advance(dt)
@@ -107,9 +90,48 @@ function advance(dt)
     end
 end
 
+function hit_ship()
+    for i_bullet, bullet in ipairs(bullets_baddies) do
+        if is_colliding(bullet, ship) then
+            bullet:collide(ship)
+            ship:collide(bullet)
+
+            if bullet.dead then
+                table.remove(bullets_baddies, i_bullet)
+            end
+        end
+    end
+end
+
+function hit_baddies()
+    for i_bad, bad in ipairs(baddies) do
+        for i_bullet, bullet in ipairs(bullets_ship) do
+            if is_colliding(bullet, bad) then
+                bullet:collide(bad)
+                bad:collide(bullet)
+
+                if bullet.dead then
+                    table.remove(bullets_ship, i_bullet)
+                end
+
+                if bad.dead then
+                    table.remove(baddies, i_bad)
+                    table.insert(booms, Boom:new(bad.x, bad.y))
+                    break
+                end
+            end
+        end
+    end
+end
+
 function love.update(dt)
-    advance(dt)
-    update(dt)
+    move(dt)
+
+    hit_ship()
+    hit_baddies()
+
+    fire_ship()
+    fire_baddies()
 end
 
 function love.keypressed(k)
@@ -132,7 +154,6 @@ function love.draw()
 
     -- Draw the current FPS.
     print_objects(0, love.graphics.getHeight() - 30, 'All', all)
-    print_objects(0, love.graphics.getHeight() - 45, 'Live', live)
     love.graphics.print("FPS: " .. love.timer.getFPS(), 0, love.graphics.getHeight() - 15)
 end
 

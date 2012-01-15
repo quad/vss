@@ -1,7 +1,7 @@
 Rail = {}
 
 function Rail:new(duration)
-    local d = duration or 2
+    local d = duration or 7
 
     return setmetatable({
         x = math.random() * 700 + 25,
@@ -29,7 +29,7 @@ function Rail:advance(dt)
         -- hovering
         if self.ready_to_spit then
             self.shots = {Bullet:new(self.x, self.y)}
-            self.ready_to_spit = true
+            self.ready_to_spit = false
         end
     elseif self.current < period * 3 then
         -- entering

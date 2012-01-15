@@ -18,6 +18,9 @@ function Boom:advance(dt)
     end
 end
 
+function Boom:collide()
+end
+
 function Boom:draw()
     local r, g, b, a = love.graphics.getColor()
 

@@ -32,6 +32,9 @@ function Ship:bounds()
     }
 end
 
+function Ship:collide()
+end
+
 function Ship:draw()
     local half_size = self.size / 2
     love.graphics.rectangle(

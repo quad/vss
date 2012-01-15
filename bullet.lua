@@ -35,6 +35,9 @@ function Bullet:draw()
     love.graphics.setColor(r, g, b, a)
 end
 
+function Bullet:collide()
+end
+
 function Bullet:bounds()
     return {
         x = self.x - self.size,
