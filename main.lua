@@ -104,8 +104,6 @@ function advance(dt)
 end
 
 function love.update(dt)
-    dt = math.min(dt, 1.0 / 60.0)
-
     advance(dt)
     update(dt)
 end
