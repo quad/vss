@@ -1,13 +1,13 @@
 Bullet = {}
 
-function Bullet:new(x, y, theta, deadly)
+function Bullet:new(x, y, theta, deadly, v)
     return setmetatable({
         x = x,
         y = y,
         dead = false,
         deadly = deadly or false,
         size = 5,
-        v = 1000,
+        v = v or 1000,
         theta = theta or math.pi}, {__index = self})
 end
 

@@ -1,12 +1,21 @@
-Rail = {}
+Rail = {
+    x = 0,
+    y = 0,
+    dead = true,
+    shots = {}
+}
 
-function Rail:new(duration)
+function Rail:advance(dt)
+end
+
+BetaRail = {}
+
+function BetaRail:new(duration)
     local d = duration or 7
 
     return setmetatable({
         x = math.random() * 700 + 25,
         depth = math.random() * 300,
-        points = points,
         current = d,
         duration = d,
         dead = false,
@@ -15,7 +24,7 @@ function Rail:new(duration)
     }, {__index = self})
 end
 
-function Rail:advance(dt)
+function BetaRail:advance(dt)
     self.current = self.current - dt
 
     local period = self.duration / 3
@@ -37,6 +46,36 @@ function Rail:advance(dt)
     end
 end
 
-function Rail:is_hovering()
+function BetaRail:is_hovering()
     return self.current < period * 2
+end
+
+SamRail = {}
+
+function SamRail:new(x, y, v, t)
+    return setmetatable({
+        x = x,
+        y = y,
+        dead = true,
+        shots = {},
+
+        v = v or 100,
+        t = t or math.pi * 0.75,
+        d = 2
+    }, {__index = self})
+end
+
+function SamRail:advance(dt)
+    self.x = self.x + self.v * math.sin(self.t) * dt
+    self.y = self.y - self.v * math.cos(self.t) * dt
+
+    self.d = self.d - dt
+    if self.d < 0 then
+        self.d = 2
+        self.shots = {Bullet:new(self.x, self.y, math.pi, true, 500)}
+    end
+
+    self.dead = self.x < 0 or self.y < 0
+        or self.y > love.graphics.getHeight()
+        or self.x > love.graphics.getWidth()
 end
