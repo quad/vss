@@ -38,10 +38,6 @@ function love.load(arg)
     ship = Ship:new(400, 300, joystick)
     table.insert(ships, ship)
 
-    local w = Wave:new()
-    for _, b in ipairs(w:spawn()) do
-        table.insert(baddies, b)
-    end
 end
 
 function love.joystickpressed(j, b)
@@ -135,6 +131,8 @@ function hit_baddies()
     end
 end
 
+last_spawn = 0
+
 function love.update(dt)
     move(dt)
 
@@ -143,6 +141,17 @@ function love.update(dt)
 
     fire_ship()
     fire_baddies()
+
+    last_spawn = last_spawn - dt
+
+    if last_spawn < 0 then
+        last_spawn = 1
+
+        local w = Wave:new()
+        for _, b in ipairs(w:spawn()) do
+            table.insert(baddies, b)
+        end
+    end
 end
 
 function love.keypressed(k)
