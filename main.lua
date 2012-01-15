@@ -19,12 +19,16 @@ ships = {}
 bullets = {}
 baddies = {}
 booms = {}
+sounds = {}
 
 live = {ships, bullets, baddies}
 all = {ships, bullets, baddies, booms}
 
 function love.load(arg)
     love.joystick.open(joystick.n)
+
+    sounds.player_shot = love.audio.newSource("resources/playershoot.ogg", "static")
+    sounds.player_shot:setLooping(true)
 
     ship = Ship:new(400, 300, joystick)
     table.insert(ships, ship)
@@ -47,7 +51,12 @@ end
 
 function update_bullets()
     if fire_everything then
+        if sounds.player_shot:isStopped() then
+            sounds.player_shot:play()
+        end
         table.insert(bullets, Bullet:new(ship.x, ship.y, 0, true))
+    elseif not sounds.player_shot:isStopped() then
+        sounds.player_shot:stop()
     end
 
     for i_bad, bad in ipairs(baddies) do
