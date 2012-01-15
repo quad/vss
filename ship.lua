@@ -27,8 +27,8 @@ function Ship:bounds()
     return {
         x = self.x, 
         y = self.y, 
-        width = 1, 
-        height = 1
+        width = 3, 
+        height = 3 
     }
 end
 

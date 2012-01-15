@@ -18,6 +18,7 @@ function Bad:advance(dt)
     self.y = self.rail.y
     self.dead = self.rail.dead 
     self.shots = self.rail.shots
+    self.rail.shots = {}
 end
 
 function Bad:collide(bullet)
