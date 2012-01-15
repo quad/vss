@@ -23,11 +23,21 @@ function Ship:advance(dt)
     self.y = self.y + axis_update(joystick, 'ud') * dt
 end
 
+function Ship:bounds()
+    return {
+        x = self.x, 
+        y = self.y, 
+        width = 1, 
+        height = 1
+    }
+end
+
 function Ship:draw()
+    local half_size = self.size / 2
     love.graphics.rectangle(
         'line', 
-        self.x - (self.size / 2), 
-        self.y - (self.size / 2), 
+        self.x - half_size, 
+        self.y - half_size, 
         self.size, 
         self.size
     )

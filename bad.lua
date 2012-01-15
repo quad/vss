@@ -7,6 +7,7 @@ function Bad:new(x, y)
         x = x,
         y = y,
         dead = false,
+        size = 20, 
         rail = Rail:new()
     }, {__index = self})
 end
@@ -25,13 +26,23 @@ function Bad:collide(bullet)
     end
 end
 
+function Bad:bounds()
+    local half_size = self.size / 2
+    return {
+        x = self.x - half_size, 
+        y = self.y - half_size, 
+        width = self.size, 
+        height = self.size
+    } 
+end
+
 function Bad:draw()
-    local size = 20
+    local half_size = self.size / 2
 
     love.graphics.triangle(
         'line',
-        self.x, self.y + (size / 2),
-        self.x + (size / 2), self.y - (size / 2),
-        self.x - (size / 2), self.y - (size / 2)
+        self.x, self.y + half_size,
+        self.x + half_size, self.y - half_size,
+        self.x - half_size, self.y - half_size
     )
 end

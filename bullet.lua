@@ -6,7 +6,7 @@ function Bullet:new(x, y, theta, deadly)
         y = y,
         dead = false,
         deadly = deadly or false,
-        radius = 5,
+        size = 5,
         v = 1000,
         theta = theta or math.pi}, {__index = self})
 end
@@ -21,7 +21,27 @@ function Bullet:advance(dt)
 end
 
 function Bullet:draw()
-    love.graphics.circle('fill', self.x, self.y, self.radius)
+    local r, g, b, a = love.graphics.getColor()
+
+    love.graphics.setColor(174, 0, 68)
+    love.graphics.rectangle(
+        'fill', 
+        self.x, 
+        self.y, 
+        self.size,
+        self.size
+    )
+
+    love.graphics.setColor(r, g, b, a)
+end
+
+function Bullet:bounds()
+    return {
+        x = self.x - self.size,
+        y = self.y - self.size,
+        width = self.size * 2,
+        height = self.size * 2
+    }
 end
 
 function Bullet:is_offscreen()

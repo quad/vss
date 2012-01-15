@@ -60,19 +60,14 @@ function update_bullets()
 end
 
 function is_colliding(a, b)
-    local abs_x = a.x - b.x
-    local abs_y = a.y - b.y
-    -- LOSING
-    -- return math.abs(abs_x) < a.radius and math.abs(abs_y) < a.radius
-    -- WINNING
-    distance = math.sqrt(abs_x * abs_x + abs_y * abs_y)
-    return distance < a.radius
+    local ax2, ay2, bx2, by2 = a.x + a.width, a.y + a.height, b.x + b.width, b.y + b.height
+    return a.x < bx2 and ax2 > b.x and a.y < by2 and ay2 > b.y
 end
 
 function collision_detection()
     for i_bad, bad in ipairs(baddies) do
         for i_bullet, bullet in ipairs(bullets) do
-            if is_colliding(bullet, bad) then
+            if is_colliding(bullet:bounds(), bad:bounds()) then
                 bad:collide(bullet)
 
                 if bad.dead then
