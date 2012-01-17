@@ -101,7 +101,7 @@ function hit_ship()
 
             if ship.dead then
                 table.insert(booms, Boom:new(ship.x, ship.y))
-		sounds.ship_boom:play()
+                sounds.ship_boom:play()
             end
         end
     end
@@ -122,8 +122,8 @@ function hit_baddies()
                     table.remove(baddies, i_bad)
                     table.insert(booms, Boom:new(bad.x, bad.y))
 
-		    local explosion = love.audio.newSource(sounds.bad_boom)
-		    explosion:play()
+                    local explosion = love.audio.newSource(sounds.bad_boom)
+                    explosion:play()
                     break
                 end
             end
