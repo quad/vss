@@ -23,6 +23,16 @@ function Ship:advance(dt)
     self.x = self.x + axis_update(joystick, 'lr') * dt
     self.y = self.y + axis_update(joystick, 'ud') * dt
     self.t = self.t + 2 * dt
+    if self.x < 0 then
+        self.x = 0
+    elseif self.x > self:bounds().x then
+        self.x = self:bounds().x
+    end
+    if self.y < 0 then
+        self.y = 0
+    elseif self.y > self:bounds().y then
+        self.y = self:bounds().y
+    end
 end
 
 function Ship:bounds()
