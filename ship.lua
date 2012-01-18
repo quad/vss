@@ -25,13 +25,13 @@ function Ship:advance(dt)
     self.t = self.t + 2 * dt
     if self.x < 0 then
         self.x = 0
-    elseif self.x > self:bounds().x then
-        self.x = self:bounds().x
+    elseif self.x > love.graphics.getWidth() then
+        self.x = love.graphics.getWidth()
     end
     if self.y < 0 then
         self.y = 0
-    elseif self.y > self:bounds().y then
-        self.y = self:bounds().y
+    elseif self.y > love.graphics.getHeight() then
+        self.y = love.graphics.getHeight()
     end
 end
 
