@@ -23,6 +23,16 @@ function Ship:advance(dt)
     self.x = self.x + axis_update(joystick, 'lr') * dt
     self.y = self.y + axis_update(joystick, 'ud') * dt
     self.t = self.t + 2 * dt
+    if self.x < 0 then
+        self.x = 0
+    elseif self.x > love.graphics.getWidth() then
+        self.x = love.graphics.getWidth()
+    end
+    if self.y < 0 then
+        self.y = 0
+    elseif self.y > love.graphics.getHeight() then
+        self.y = love.graphics.getHeight()
+    end
 end
 
 function Ship:bounds()
