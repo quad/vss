@@ -71,11 +71,11 @@ function fire_ship()
 end
 
 function is_colliding(a, b)
-    local bounds_a, bounds_b = a:bounds(), b:bounds()
+    local box_a, box_b = a:box(), b:box()
 
-    local ax2, ay2 = bounds_a.x + bounds_a.width, bounds_a.y + bounds_a.height
-    local bx2, by2 = bounds_b.x + bounds_b.width, bounds_b.y + bounds_b.height
-    return bounds_a.x < bx2 and ax2 > bounds_b.x and bounds_a.y < by2 and ay2 > bounds_b.y
+    local ax2, ay2 = box_a.x + box_a.width, box_a.y + box_a.height
+    local bx2, by2 = box_b.x + box_b.width, box_b.y + box_b.height
+    return box_a.x < bx2 and ax2 > box_b.x and box_a.y < by2 and ay2 > box_b.y
 end
 
 function move(dt)

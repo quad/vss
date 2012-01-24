@@ -38,7 +38,7 @@ end
 function Bullet:collide()
 end
 
-function Bullet:bounds()
+function Bullet:box()
     return {
         x = self.x - self.size,
         y = self.y - self.size,

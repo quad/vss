@@ -33,7 +33,7 @@ function Bad:collide(bullet)
     end
 end
 
-function Bad:bounds()
+function Bad:box()
     local half_size = self.size / 2
     return {
         x = self.x - half_size, 

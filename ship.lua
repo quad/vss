@@ -35,7 +35,7 @@ function Ship:advance(dt)
     end
 end
 
-function Ship:bounds()
+function Ship:box()
     return {
         x = self.x, 
         y = self.y, 
