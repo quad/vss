@@ -113,34 +113,27 @@ function bullet(x, y, direction, speed, ...)
     return patterns.Bullet:new(x, y, direction, speed, arg)
 end
 
-patterns.Wait = {}
-
-function patterns.Wait:new(ticks)
-    return setmetatable(
-        {ticks = ticks}, 
-        {__index = self}
-    )
-end
-
-function patterns.Wait:blocking()
-    return true
-end
-
-function patterns.Wait:advance()
-    if not self:done() then
-        self.ticks = self.ticks - 1
-    end
-
-    return {}
-end
-
-function patterns.Wait:done()
-    return self.ticks <= 0
-end
-
 function wait(ticks)
     return function(_)
-        return patterns.Wait:new(ticks)
+        local wait = {ticks = ticks}
+
+        function wait:blocking()
+            return true
+        end
+
+        function wait:advance()
+            if not self:done() then
+                self.ticks = self.ticks - 1
+            end
+
+            return {}
+        end
+        
+        function wait:done()
+            return self.ticks <= 0
+        end
+
+        return wait
     end
 end
 
