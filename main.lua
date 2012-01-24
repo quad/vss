@@ -25,6 +25,8 @@ sounds = {}
 
 all = {ships, bullets_baddies, bullets_ship, baddies, booms}
 
+recent_frame_times = {0.0}
+
 function love.load(arg)
     love.joystick.open(joystick.n)
 
@@ -37,7 +39,6 @@ function love.load(arg)
 
     ship = Ship:new(400, 300, joystick)
     table.insert(ships, ship)
-
 end
 
 function love.joystickpressed(j, b)
@@ -160,6 +161,47 @@ function love.keypressed(k)
     end
 end
 
+function fps()
+    local sum = 0.0
+    for i, v in ipairs(recent_frame_times) do
+        sum = sum + v
+    end
+
+    local avg_frame_time= sum / table.maxn(recent_frame_times)
+    return math.floor(1 / avg_frame_time)
+end
+
+function love.run()
+    love.load(arg)
+
+    while true do
+        local now = love.timer.getMicroTime()
+
+        love.update(1 / 60)
+        love.graphics.clear()
+        love.draw()
+        love.graphics.present()
+
+        -- Process events.
+        for e,a,b,c in love.event.poll() do
+            if e == "q" then
+                if not love.quit or not love.quit() then
+                    if love.audio then
+                        love.audio.stop()
+                    end
+                    return
+                end
+            end
+            love.handlers[e](a,b,c)
+        end
+
+        table.insert(recent_frame_times, love.timer.getMicroTime() - now)
+        if table.maxn(recent_frame_times) > 100 then
+            table.remove(recent_frame_times, 1)
+        end
+    end
+end
+
 function love.draw()
     for i, things in ipairs(all) do
         for i, t in ipairs(things) do
@@ -174,7 +216,7 @@ function love.draw()
 
     -- Draw the current FPS.
     print_objects(0, love.graphics.getHeight() - 30, 'All', all)
-    love.graphics.print("FPS: " .. love.timer.getFPS(), 0, love.graphics.getHeight() - 15)
+    love.graphics.print("FPS: " .. fps(), 0, love.graphics.getHeight() - 15)
 end
 
 function print_objects(x, y, title, objs)
