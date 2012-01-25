@@ -325,6 +325,39 @@ function fire(...)
     end
 end
 
+function loop(count, generator)
+    return function(action)
+        local l = {
+            action = action,
+            count = count,
+            generator = generator,
+            childe = nil,
+            current = 0
+        }
+
+        function l:advance()
+            if not self:done() then
+                if not self.child then
+                    self.child = generator(self.action.bullet)
+                end
+
+                self.child:advance()
+
+                if self.child:done() then
+                    self.child = nil
+                    self.current = self.current + 1
+                end
+            end
+        end
+
+        function l:done()
+            return self.current >= self.count
+        end
+
+        return l
+    end
+end
+
 -- Pattern = {}
 -- 
 -- function patterns.Pattern:new(actions, bullet_pool)
