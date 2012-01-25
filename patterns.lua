@@ -132,7 +132,8 @@ end
 -- TODO: END
 
 function bullet(direction, speed, ...)
-    local actions = arg
+    local actions = {action(...)}
+
     return function(x, y)
         return patterns.Bullet:new(x, y, direction, speed, actions)
     end
@@ -325,7 +326,9 @@ function fire(...)
     end
 end
 
-function loop(count, generator)
+function loop(count, ...)
+    local generator = action(...)
+
     return function(action)
         local l = {
             action = action,
