@@ -69,7 +69,7 @@ end
 
 patterns.Bullet = {}
 
-function patterns.Bullet:new(x, y, direction, speed, actions)
+function patterns.Bullet:new(x, y, direction, speed, body)
     local t = {
         x = x,
         y = y,
@@ -79,28 +79,17 @@ function patterns.Bullet:new(x, y, direction, speed, actions)
         my = 0
     }
 
-    local _actions = {}
-    for i, a in ipairs(actions) do
-        table.insert(_actions, a(t))
-    end
-
-    t.actions = _actions
+    t.body = body(t)
 
     return setmetatable(t, {__index = self})
 end
 
 function patterns.Bullet:advance()
-    for i, action in ipairs(self.actions) do
-        local done = action:done()
+    local done = self.body:done()
 
-        if not done then
-            action:advance()
-            done = action:done()
-        end
-
-        if done then
-            table.remove(self.actions, i)
-        end
+    if not done then
+        self.body:advance()
+        done = self.body:done()
     end
 
     self.x = self.mx + self.x + math.sin(self.direction) * self.speed
@@ -108,7 +97,7 @@ function patterns.Bullet:advance()
 end
 
 function patterns.Bullet:done()
-    return table.maxn(self.actions) == 0
+    return self.body:done()
 end
 
 -- TODO: Move this somewhere else. This bullet should only be a model, not a display
@@ -132,10 +121,10 @@ end
 -- TODO: END
 
 function bullet(direction, speed, ...)
-    local actions = {action(...)}
+    local body = action(...)
 
     return function(x, y)
-        return patterns.Bullet:new(x, y, direction, speed, actions)
+        return patterns.Bullet:new(x, y, direction, speed, body)
     end
 end
 
