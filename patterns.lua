@@ -33,17 +33,13 @@ function patterns.Action:new(bullet, children)
 end
 
 function patterns.Action:advance()
-    --local created = {}
     local finished = {}
 
     for i, child in ipairs(self.children) do
         local done = child:done()
 
         if not done then
-            for i, new in ipairs(child:advance()) do 
-                table.insert(created, new) 
-            end
-
+            child:advance()
             done = child:done()
         end
 
@@ -54,15 +50,9 @@ function patterns.Action:advance()
         end
     end
 
-    for i=#finished,1,-1 do
+    for i = #finished,1,-1 do
         table.remove(self.children, i)
     end
-
-    --for i, new in ipairs(created) do
-    --    table.insert(self.children, new)
-    --end
-
-    return {} 
 end
 
 function patterns.Action:done()
@@ -141,8 +131,11 @@ end
     end
 -- TODO: END
 
-function bullet(x, y, direction, speed, ...)
-    return patterns.Bullet:new(x, y, direction, speed, arg)
+function bullet(direction, speed, ...)
+    local actions = arg
+    return function(x, y)
+        return patterns.Bullet:new(x, y, direction, speed, actions)
+    end
 end
 
 function wait(ticks)
@@ -153,8 +146,6 @@ function wait(ticks)
             if not self:done() then
                 self.ticks = self.ticks - 1
             end
-
-            return {}
         end
         
         function w:done()
@@ -183,8 +174,6 @@ function accelerate(vertical, horizontal, frames)
                 self.action.bullet.my = self.action.bullet.my + self.vertical
                 self.action.bullet.mx = self.action.bullet.mx + self.horizontal
             end
-
-            return {}
         end
 
         function acc:done()
@@ -205,8 +194,6 @@ function vanish()
         function v:advance()
             self.action.bullet.dead = true
             self.vanished = true
-
-            return {}
         end
 
         function v:done()
@@ -240,8 +227,6 @@ function change_speed(speed, frames)
                     self.action.bullet.speed = self.action.bullet.speed + delta
                 end
             end
-
-            return {}
         end
 
         function spd:done()
@@ -296,8 +281,6 @@ function change_direction(direction, frames, orient)
                 self.current = self.current + 1
                 self:_advance()
             end
-
-            return {}
         end
 
         function cd:done()
@@ -314,6 +297,32 @@ end
 
 function fire(...)
     local bullets = arg
+    return function(action)
+        local f = {
+            action = action,
+            bullets = bullets,
+            fired = false
+        }
+
+        function f:advance()
+            if not self:done() then
+                self.fired = true
+
+                for i, b in ipairs(self.bullets) do
+                    local new_bullet = b(action.bullet.x, action.bullet.y)
+
+                    -- TODO: Abstract this elsewhere
+                    table.insert(bullets_baddies, new_bullet)
+                end
+            end
+        end
+
+        function f:done()
+            return self.fired
+        end
+
+        return f
+    end
 end
 
 -- Pattern = {}
