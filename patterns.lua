@@ -33,7 +33,8 @@ function patterns.Action:new(bullet, children)
 end
 
 function patterns.Action:advance()
-    local created = {}
+    --local created = {}
+    local finished = {}
 
     for i, child in ipairs(self.children) do
         local done = child:done()
@@ -49,13 +50,17 @@ function patterns.Action:advance()
         if child.blocking and not done then
             break
         elseif done then
-            table.remove(self.children, i)
+            table.insert(finished, i)
         end
     end
 
-    for i, new in ipairs(created) do
-        table.insert(self.children, new)
+    for i=#finished,1,-1 do
+        table.remove(self.children, i)
     end
+
+    --for i, new in ipairs(created) do
+    --    table.insert(self.children, new)
+    --end
 
     return {} 
 end
@@ -110,39 +115,31 @@ function patterns.Bullet:advance()
 
     self.x = self.mx + self.x + math.sin(self.direction) * self.speed
     self.y = self.my + self.y + math.cos(self.direction) * self.speed
-
-    if self:is_offscreen() then
-        self.dead = true
-    end
 end
 
 function patterns.Bullet:done()
     return table.maxn(self.actions) == 0
 end
 
-function patterns.Bullet:draw()
-    local r, g, b, a = love.graphics.getColor()
+-- TODO: Move this somewhere else. This bullet should only be a model, not a display
+    function patterns.Bullet:draw()
+        local r, g, b, a = love.graphics.getColor()
 
-    love.graphics.setColor(174, 0, 68)
-    love.graphics.rectangle('fill', self.x, self.y, 5, 5)
+        love.graphics.setColor(174, 0, 68)
+        love.graphics.rectangle('fill', self.x, self.y, 5, 5)
 
-    love.graphics.setColor(r, g, b, a)
-end
+        love.graphics.setColor(r, g, b, a)
+    end
 
-function patterns.Bullet:box()
-    return {
-        x = self.x - 5,
-        y = self.y - 5,
-        width = 10,
-        height = 10 
-    }
-end
-
-function patterns.Bullet:is_offscreen()
-    return self.x < 0 or self.y < 0
-        or self.y > love.graphics.getHeight()
-        or self.x > love.graphics.getWidth()
-end
+    function patterns.Bullet:box()
+        return {
+            x = self.x - 5,
+            y = self.y - 5,
+            width = 10,
+            height = 10 
+        }
+    end
+-- TODO: END
 
 function bullet(x, y, direction, speed, ...)
     return patterns.Bullet:new(x, y, direction, speed, arg)
@@ -150,9 +147,9 @@ end
 
 function wait(ticks)
     return function(_)
-        local wait = {ticks = ticks, blocking = true}
+        local w = {ticks = ticks, blocking = true}
 
-        function wait:advance()
+        function w:advance()
             if not self:done() then
                 self.ticks = self.ticks - 1
             end
@@ -160,11 +157,11 @@ function wait(ticks)
             return {}
         end
         
-        function wait:done()
+        function w:done()
             return self.ticks <= 0
         end
 
-        return wait
+        return w
     end
 end
 
@@ -318,3 +315,22 @@ end
 function fire(...)
     local bullets = arg
 end
+
+-- Pattern = {}
+-- 
+-- function patterns.Pattern:new(actions, bullet_pool)
+--     return setmetatable({
+--         actions = actions,
+--         bullet_pool = bullet_pool
+--     }, {__index = self})
+-- end
+-- 
+-- function patterns.Pattern:advance()
+--     for i, action in self.actions do
+--         local created = action:advance()
+--     end
+-- end
+-- 
+-- function pattern(...)
+--     local actions = arg
+-- end
