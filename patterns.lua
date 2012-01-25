@@ -45,7 +45,7 @@ function patterns.Action:advance()
             done = child:done()
         end
 
-        if child:blocking() and not done then
+        if child.blocking and not done then
             break
         elseif done then
             table.remove(self.children, i)
@@ -86,6 +86,8 @@ function patterns.Bullet:new(x, y, direction, speed, actions)
     self.direction = direction
     self.speed = speed
     self.actions = _actions
+    self.mx = 0
+    self.my = 0
     
     return mt
 end
@@ -104,8 +106,8 @@ function patterns.Bullet:advance()
         end
     end
 
-    self.x = self.x + math.sin(self.direction) * self.speed
-    self.y = self.y + math.cos(self.direction) * self.speed
+    self.x = self.mx + self.x + math.sin(self.direction) * self.speed
+    self.y = self.my + self.y + math.cos(self.direction) * self.speed
 
     if self:is_offscreen() then
         self.dead = true
@@ -146,11 +148,7 @@ end
 
 function wait(ticks)
     return function(_)
-        local wait = {ticks = ticks}
-
-        function wait:blocking()
-            return true
-        end
+        local wait = {ticks = ticks, blocking = true}
 
         function wait:advance()
             if not self:done() then
@@ -165,6 +163,71 @@ function wait(ticks)
         end
 
         return wait
+    end
+end
+
+function accelerate(vertical, horizontal, frames)
+    return function(action)
+        local acc = {
+            action = action,
+            frames = frames or 0,
+            current = 0
+        }
+
+        acc.vertical = vertical / frames
+        acc.horizontal = horizontal / frames
+        
+        function acc:advance()
+            if not self:done() then
+                self.current = self.current + 1
+
+                self.action.bullet.my = self.action.bullet.my + self.vertical
+                self.action.bullet.mx = self.action.bullet.mx + self.horizontal
+            end
+
+            return {}
+        end
+
+        function acc:done()
+            return self.current >= self.frames
+        end
+
+        return acc
+    end
+end
+
+function change_speed(speed, frames)
+    return function(action)
+        local spd = {
+            action = action,
+            frames = frames or 0,
+            speed = speed,
+            current = 0
+        }
+
+        function spd:advance()
+            if not self:done() then
+                self.current = self.current + 1
+
+                local remaining = self.frames - self.current
+                
+                if remaining > 0 then
+                    local start = self.action.bullet.speed
+                    local total_change = (self.speed - start)
+                    local delta = total_change / remaining
+
+                    self.action.bullet.speed = self.action.bullet.speed + delta
+                end
+            end
+
+            return {}
+        end
+
+        function spd:done()
+            return self.current >= self.frames
+        end
+
+        return spd
     end
 end
 
@@ -206,10 +269,6 @@ function change_direction(direction, frames, orient)
             frames = frames or 0,
             current = 0
         }
-
-        function cd:blocking()
-            return false
-        end
 
         function cd:advance()
             if not self:done() then

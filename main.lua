@@ -148,8 +148,7 @@ function love.update(dt)
     if table.maxn(bullets_baddies) == 0 then
         local b = bullet(300, 100, 0, 3, action(
             change_direction(-math.pi / 4, 50, "absolute"),
-            wait(50),
-            change_direction(math.pi, 50, "relative")
+            wait(50), change_speed(10, 10)
         ))
         table.insert(bullets_baddies, b)
     end
