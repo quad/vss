@@ -18,17 +18,18 @@ patterns = {}
 patterns.Action = {}
 
 function patterns.Action:new(bullet, children) 
-    local mt = setmetatable({}, {__index = self})
+    local t = {
+        bullet = bullet
+    }
 
     local _children = {}
     for i, c in ipairs(children) do
-        table.insert(_children, c(self))
+        table.insert(_children, c(t))
     end
 
-    self.children = _children
-    self.bullet = bullet
+    t.children = _children
 
-    return mt
+    return setmetatable(t, {__index = self})
 end
 
 function patterns.Action:advance()
@@ -74,22 +75,23 @@ end
 patterns.Bullet = {}
 
 function patterns.Bullet:new(x, y, direction, speed, actions)
-    local mt = setmetatable({}, {__index = self})
+    local t = {
+        x = x,
+        y = y,
+        direction = direction,
+        speed = speed,
+        mx = 0,
+        my = 0
+    }
 
     local _actions = {}
     for i, a in ipairs(actions) do
-        table.insert(_actions, a(self))
+        table.insert(_actions, a(t))
     end
 
-    self.x = x
-    self.y = y
-    self.direction = direction
-    self.speed = speed
-    self.actions = _actions
-    self.mx = 0
-    self.my = 0
-    
-    return mt
+    t.actions = _actions
+
+    return setmetatable(t, {__index = self})
 end
 
 function patterns.Bullet:advance()
@@ -193,6 +195,28 @@ function accelerate(vertical, horizontal, frames)
         end
 
         return acc
+    end
+end
+
+function vanish()
+    return function(action)
+        local v = {
+            action = action, 
+            vanished = false
+        }
+
+        function v:advance()
+            self.action.bullet.dead = true
+            self.vanished = true
+
+            return {}
+        end
+
+        function v:done()
+            return self.vanished
+        end
+
+        return v
     end
 end
 

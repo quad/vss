@@ -82,7 +82,7 @@ function move(dt)
     for i_things, things in ipairs(all) do
         for i_t, t in ipairs(things) do
             t:advance(dt)
-
+            
             if t.dead then
                 table.remove(things, i_t)
             end
@@ -147,11 +147,23 @@ function love.update(dt)
 
     if table.maxn(bullets_baddies) == 0 then
         local b = bullet(300, 100, 0, 3, action(
-            change_direction(-math.pi / 4, 50, "absolute"),
-            wait(50), change_speed(10, 10)
+            --change_direction(-math.pi / 4, 50, "absolute")
+            wait(30),
+            vanish()
         ))
+
+        local b2 = bullet(400, 100, 0, 3, action(
+            --change_direction(-math.pi / 4, 50, "absolute")
+            wait(30),
+            vanish()
+        ))
+
         table.insert(bullets_baddies, b)
+        table.insert(bullets_baddies, b2)
     end
+
+    local d = ""
+    if bullets_baddies[1].dead then d = "yup" else d = "nah" end
 
 --     last_spawn = last_spawn - dt
 -- 
