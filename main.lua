@@ -143,16 +143,27 @@ function love.update(dt)
     fire_ship()
     fire_baddies()
 
-    last_spawn = last_spawn - dt
+    require 'patterns'
 
-    if last_spawn < 0 then
-        last_spawn = 1
-
-        local w = Wave:new()
-        for _, b in ipairs(w:spawn()) do
-            table.insert(baddies, b)
-        end
+    if table.maxn(bullets_baddies) == 0 then
+        local b = bullet(300, 100, 0, 3, action(
+            change_direction(-math.pi / 4, 50, "absolute"),
+            wait(50),
+            change_direction(math.pi, 50, "relative")
+        ))
+        table.insert(bullets_baddies, b)
     end
+
+--     last_spawn = last_spawn - dt
+-- 
+--     if last_spawn < 0 then
+--         last_spawn = 1
+-- 
+--         local w = Wave:new()
+--         for _, b in ipairs(w:spawn()) do
+--             table.insert(baddies, b)
+--         end
+--     end
 end
 
 function love.keypressed(k)
