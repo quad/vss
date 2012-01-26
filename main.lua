@@ -79,24 +79,32 @@ end
 
 function move(dt)
     for i_things, things in ipairs(all) do
+        local dead = {}
+
         for i_t, t in ipairs(things) do
             t:advance(dt)
             
             if t.dead then
-                table.remove(things, i_t)
+                table.insert(dead, i_t)
             end
+        end
+
+        for i_dead = #dead,1,-1 do
+            table.remove(things, dead[i_dead])
         end
     end
 end
 
 function hit_ship()
+    local dead = {}
+
     for i_bullet, bullet in ipairs(bullets_baddies) do
         if is_colliding(bullet, ship) then
             bullet:collide(ship)
             ship:collide(bullet)
 
             if bullet.dead then
-                table.remove(bullets_baddies, i_bullet)
+                table.insert(dead, i_bullet)
             end
 
             if ship.dead then
@@ -105,9 +113,16 @@ function hit_ship()
             end
         end
     end
+
+    for i_dead = #dead,1,-1 do
+        table.remove(bullets_baddies, dead[i_dead])
+    end
 end
 
 function hit_baddies()
+    local dead_baddies = {}
+    local dead_bullets = {}
+
     for i_bad, bad in ipairs(baddies) do
         for i_bullet, bullet in ipairs(bullets_ship) do
             if is_colliding(bullet, bad) then
@@ -115,11 +130,11 @@ function hit_baddies()
                 bad:collide(bullet)
 
                 if bullet.dead then
-                    table.remove(bullets_ship, i_bullet)
+                    table.insert(dead_bullets, i_bullet)
                 end
 
                 if bad.dead then
-                    table.remove(baddies, i_bad)
+                    table.insert(dead_baddies, i_bad)
                     table.insert(booms, Boom:new(bad.x, bad.y))
 
                     local explosion = love.audio.newSource(sounds.bad_boom)
@@ -128,6 +143,14 @@ function hit_baddies()
                 end
             end
         end
+    end
+
+    for i_dead = #dead_baddies,1,-1 do
+        table.remove(baddies, dead_baddies[i_dead])
+    end
+
+    for i_dead = #dead_bullets,1,-1 do
+        table.remove(bullets_ship, dead_bullets[i_dead])
     end
 end
 
