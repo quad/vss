@@ -3,6 +3,9 @@ require 'boom'
 require 'ship'
 require 'wave'
 
+    require 'graphics/bullets'
+    drawable = graphics.bullets.drawable
+
     require 'patterns'
 
     bullet = patterns.bullet
@@ -11,7 +14,6 @@ require 'wave'
     loop = patterns.loop
     fire = patterns.fire
     vanish = patterns.vanish
-    drawable = patterns.drawable
 
 
 joystick = {

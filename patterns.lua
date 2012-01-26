@@ -49,49 +49,6 @@ local function action(...)
     end
 end
 
--- TODO: This should move all to another module
-function patterns.drawable(bullet)
-    local d = {bullet = bullet}
-
-    function d:advance()
-        self.bullet:advance()
-
-        if not self.dead and self.bullet.dead then
-            self.dead = true
-        end
-    end
-
-    function d:draw()
-        local r, g, b, a = love.graphics.getColor()
-
-        love.graphics.setColor(174, 0, 68)
-        love.graphics.rectangle('fill', self.bullet.x, self.bullet.y, 5, 5)
-
-        love.graphics.setColor(r, g, b, a)
-
-        if self:is_offscreen() then
-            self.dead = true
-        end
-    end
-
-    function d:box()
-        return {
-            x = self.bullet.x - 5,
-            y = self.bullet.y - 5,
-            width = 10,
-            height = 10 
-        }
-    end
-
-    function d:is_offscreen()
-        return self.bullet.x < 0 or self.bullet.y < 0
-            or self.bullet.y > love.graphics.getHeight()
-            or self.bullet.x > love.graphics.getWidth()
-    end
-
-    return d
-end
-
 function patterns.bullet(direction, speed, ...)
     local body = action(...)
 
