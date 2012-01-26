@@ -1,18 +1,3 @@
--- fallerLeft = fire(
---     bullet(
---         direction = 180,
---         speed = 1,
---         action(
---             wait(10), 
---             change_direction(5, 45)
---         )
---     )
--- )
--- 
--- local pattern = action(repeat(100, action(fallerLeft, wait(8))))
--- local all = {pattern}
--- ...
-
 patterns = {}
 
 patterns.Action = {}
@@ -69,14 +54,15 @@ end
 
 patterns.Bullet = {}
 
-function patterns.Bullet:new(x, y, direction, speed, body)
+function patterns.Bullet:new(x, y, direction, speed, body, child_created)
     local t = {
         x = x,
         y = y,
         direction = direction,
         speed = speed,
         mx = 0,
-        my = 0
+        my = 0,
+        child_created = child_created
     }
 
     t.body = body(t)
@@ -123,8 +109,8 @@ end
 function bullet(direction, speed, ...)
     local body = action(...)
 
-    return function(x, y)
-        return patterns.Bullet:new(x, y, direction, speed, body)
+    return function(x, y, child_created)
+        return patterns.Bullet:new(x, y, direction, speed, body, child_created)
     end
 end
 
@@ -299,10 +285,9 @@ function fire(...)
                 self.fired = true
 
                 for i, b in ipairs(self.bullets) do
-                    local new_bullet = b(action.bullet.x, action.bullet.y)
+                    local new_bullet = b(self.action.bullet.x, self.action.bullet.y)
 
-                    -- TODO: Abstract this elsewhere
-                    table.insert(bullets_baddies, new_bullet)
+                    self.action.bullet.child_created(new_bullet)
                 end
             end
         end
@@ -349,22 +334,3 @@ function loop(count, ...)
         return l
     end
 end
-
--- Pattern = {}
--- 
--- function patterns.Pattern:new(actions, bullet_pool)
---     return setmetatable({
---         actions = actions,
---         bullet_pool = bullet_pool
---     }, {__index = self})
--- end
--- 
--- function patterns.Pattern:advance()
---     for i, action in self.actions do
---         local created = action:advance()
---     end
--- end
--- 
--- function pattern(...)
---     local actions = arg
--- end
