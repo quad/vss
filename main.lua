@@ -180,23 +180,27 @@ function love.update(dt)
 
     if table.maxn(bullets_baddies) == 0 then
         local step = 2 * math.pi / 18
-        local circle = bullet(0, 0,
-            loop(18,
-                fire(
-                    bullet({step, "sequence"}, 6,
-                        wait(5),
-                        vanish(),
-                        fire(bullet({0, "aim"}, 1))
+
+        local circle = function(dir)
+            return bullet(0, 0,
+                vanish(),
+                loop(18,
+                    fire(
+                        bullet({step, "sequence"}, 8,
+                            wait(5),
+                            vanish(),
+                            fire(bullet(dir, 6))
+                        )
                     )
                 )
             )
-        )
+        end
 
         function c(child)
             table.insert(bullets_baddies, drawable(child))
         end
 
-        table.insert(bullets_baddies, drawable(circle(300, 100, c, ship)))
+        table.insert(bullets_baddies, drawable(circle(math.random())(300, 100, c, ship)))
     end
 
     local d = ""
