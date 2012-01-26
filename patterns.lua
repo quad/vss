@@ -1,89 +1,49 @@
 patterns = {}
 
-patterns.Action = {}
-
-function patterns.Action:new(bullet, children) 
-    local t = {
-        bullet = bullet
-    }
-
-    local _children = {}
-    for i, c in ipairs(children) do
-        table.insert(_children, c(t))
-    end
-
-    t.children = _children
-
-    return setmetatable(t, {__index = self})
-end
-
-function patterns.Action:advance()
-    local finished = {}
-
-    for i, child in ipairs(self.children) do
-        local done = child:done()
-
-        if not done then
-            child:advance()
-            done = child:done()
-        end
-
-        if child.blocking and not done then
-            break
-        elseif done then
-            table.insert(finished, i)
-        end
-    end
-
-    for i = #finished,1,-1 do
-        table.remove(self.children, i)
-    end
-end
-
-function patterns.Action:done()
-    return table.maxn(self.children) == 0
-end
-
 function action(...)
-    local items = arg
+    local children = arg
 
     return function(bullet)
-        return patterns.Action:new(bullet, items) 
+        local a = {
+            bullet = bullet
+        }
+
+        local _children = {}
+        for i, c in ipairs(children) do
+            table.insert(_children, c(a))
+        end
+
+        a.children = _children
+
+        function a:advance()
+            local finished = {}
+
+            for i, child in ipairs(self.children) do
+                local done = child:done()
+
+                if not done then
+                    child:advance()
+                    done = child:done()
+                end
+
+                if child.blocking and not done then
+                    break
+                elseif done then
+                    table.insert(finished, i)
+                end
+            end
+
+            for i = #finished,1,-1 do
+                table.remove(self.children, i)
+            end
+        end
+
+        function a:done()
+            return table.maxn(self.children) == 0
+        end
+
+        return a
     end
-end
-
-patterns.Bullet = {}
-
-function patterns.Bullet:new(x, y, direction, speed, body, child_created)
-    local t = {
-        x = x,
-        y = y,
-        direction = direction,
-        speed = speed,
-        mx = 0,
-        my = 0,
-        child_created = child_created
-    }
-
-    t.body = body(t)
-
-    return setmetatable(t, {__index = self})
-end
-
-function patterns.Bullet:advance()
-    local done = self.body:done()
-
-    if not done then
-        self.body:advance()
-        done = self.body:done()
-    end
-
-    self.x = self.mx + self.x + math.sin(self.direction) * self.speed
-    self.y = self.my + self.y + math.cos(self.direction) * self.speed
-end
-
-function patterns.Bullet:done()
-    return self.body:done()
 end
 
 -- TODO: This should move all to another module
@@ -129,7 +89,34 @@ function bullet(direction, speed, ...)
     local body = action(...)
 
     return function(x, y, child_created)
-        return patterns.Bullet:new(x, y, direction, speed, body, child_created)
+        local b = {
+            x = x,
+            y = y,
+            direction = direction,
+            speed = speed,
+            mx = 0,
+            my = 0,
+            child_created = child_created
+        }
+
+        b.body = body(b)
+
+        function b:advance()
+            local done = self.body:done()
+
+            if not done then
+                self.body:advance()
+                done = self.body:done()
+            end
+            self.x = self.mx + self.x + math.sin(self.direction) * self.speed
+            self.y = self.my + self.y + math.cos(self.direction) * self.speed
+        end
+
+        function b:done()
+            return self.body:done()
+        end
+
+        return b
     end
 end
 
