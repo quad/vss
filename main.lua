@@ -3,6 +3,17 @@ require 'boom'
 require 'ship'
 require 'wave'
 
+    require 'patterns'
+
+    bullet = patterns.bullet
+    wait = patterns.wait
+    change_direction = patterns.change_direction
+    loop = patterns.loop
+    fire = patterns.fire
+    vanish = patterns.vanish
+    drawable = patterns.drawable
+
+
 joystick = {
     n = 0,
     axes = {
@@ -63,7 +74,9 @@ function fire_ship()
         if sounds.player_shot:isStopped() then
             sounds.player_shot:play()
         end
-        table.insert(bullets_ship, Bullet:new(ship.x, ship.y, 0, true))
+
+        local shot = drawable(bullet(math.pi, 15)(ship.x, ship.y))
+        table.insert(bullets_ship, shot)
     elseif not sounds.player_shot:isStopped() then
         sounds.player_shot:stop()
     end
@@ -165,43 +178,25 @@ function love.update(dt)
     fire_ship()
     fire_baddies()
 
-    require 'patterns'
-
-    local bullet = patterns.bullet
-    local wait = patterns.wait
-    local change_direction = patterns.change_direction
-    local loop = patterns.loop
-    local fire = patterns.fire
-    local vanish = patterns.vanish
-    local drawable = patterns.drawable
-
     if table.maxn(bullets_baddies) == 0 then
-        local b = bullet(0, 3, 
-            change_direction(math.pi / 4, 10, "absolute"),
-            wait(30),
-            loop(3,
+        local step = 2 * math.pi / 18
+        local circle = bullet(0, 0,
+            loop(18,
                 fire(
-                    bullet(0, 1, 
-                        change_direction(0.5 + math.pi / 2, 50, "aim")
+                    bullet({step, "sequence"}, 6,
+                        wait(5),
+                        vanish(),
+                        fire(bullet({0, "aim"}, 1))
                     )
-                ),
-                wait(20)
+                )
             )
-        )
-
-        local b2 = bullet(0, 3, 
-            change_direction(math.pi / 4, 10, "absolute"),
-            wait(100),
-            vanish()
         )
 
         function c(child)
             table.insert(bullets_baddies, drawable(child))
         end
 
-        table.insert(bullets_baddies, drawable(b(300, 100, c, ship)))
-        table.insert(bullets_baddies, drawable(b(250, 200, c, ship)))
-        table.insert(bullets_baddies, drawable(b(150, 250, c, ship)))
+        table.insert(bullets_baddies, drawable(circle(300, 100, c, ship)))
     end
 
     local d = ""
