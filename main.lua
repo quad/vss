@@ -144,6 +144,14 @@ function love.update(dt)
 
     require 'patterns'
 
+    local bullet = patterns.bullet
+    local wait = patterns.wait
+    local change_direction = patterns.change_direction
+    local loop = patterns.loop
+    local fire = patterns.fire
+    local vanish = patterns.vanish
+    local drawable = patterns.drawable
+
     if table.maxn(bullets_baddies) == 0 then
         local b = bullet(0, 3, 
             change_direction(-math.pi / 4, 10, "absolute"),
@@ -151,9 +159,7 @@ function love.update(dt)
             loop(3,
                 fire(
                     bullet(0, 6, 
-                        change_direction(math.pi / 2, 10, "absolute"),
-                        wait(15),
-                        change_direction(math.pi / 4, 30, "relative")
+                        change_direction(0.5 + math.pi / 2, 10, "absolute")
                     )
                 ),
                 wait(20)

@@ -1,6 +1,6 @@
 patterns = {}
 
-function action(...)
+local function action(...)
     local children = arg
 
     return function(bullet)
@@ -47,7 +47,7 @@ function action(...)
 end
 
 -- TODO: This should move all to another module
-function drawable(bullet)
+function patterns.drawable(bullet)
     local d = {bullet = bullet}
 
     function d:advance()
@@ -85,7 +85,7 @@ function drawable(bullet)
     return d
 end
 
-function bullet(direction, speed, ...)
+function patterns.bullet(direction, speed, ...)
     local body = action(...)
 
     return function(x, y, child_created)
@@ -120,7 +120,7 @@ function bullet(direction, speed, ...)
     end
 end
 
-function wait(ticks)
+function patterns.wait(ticks)
     return function(_)
         local w = {ticks = ticks, blocking = true}
 
@@ -138,7 +138,7 @@ function wait(ticks)
     end
 end
 
-function accelerate(vertical, horizontal, frames)
+function patterns.accelerate(vertical, horizontal, frames)
     return function(action)
         local acc = {
             action = action,
@@ -166,7 +166,7 @@ function accelerate(vertical, horizontal, frames)
     end
 end
 
-function vanish()
+function patterns.vanish()
     return function(action)
         local v = {
             action = action, 
@@ -186,7 +186,7 @@ function vanish()
     end
 end
 
-function change_speed(speed, frames)
+function patterns.change_speed(speed, frames)
     return function(action)
         local spd = {
             action = action,
@@ -219,7 +219,7 @@ function change_speed(speed, frames)
     end
 end
 
-function change_direction(direction, frames, orient)
+function patterns.change_direction(direction, frames, orient)
     function relative(cd)
         cd.delta_per_step = cd.target / cd.frames
 
@@ -277,7 +277,7 @@ function change_direction(direction, frames, orient)
     end
 end
 
-function fire(...)
+function patterns.fire(...)
     local bullets = arg
     return function(action)
         local f = {
@@ -306,7 +306,7 @@ function fire(...)
     end
 end
 
-function loop(count, ...)
+function patterns.loop(count, ...)
     local generator = action(...)
 
     return function(action)
