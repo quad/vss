@@ -93,6 +93,21 @@ function patterns.bullet(direction, speed, ...)
     local body = action(...)
 
     return function(x, y, child_created, target)
+        print("making bullet")
+        if type(direction) == "table" then
+            local dir, orient = unpack(direction)
+
+            if orient == "sequence" then
+                direction = patterns.last_fire_direction + dir
+            elseif orient == "aim" then
+                local opposite = x - target.x
+                local adjacent = y - target.y
+                direction = math.atan(opposite / adjacent) + dir
+            else
+                direction = dir
+            end
+        end
+
         local b = {
             x = x,
             y = y,
@@ -307,6 +322,9 @@ function patterns.change_direction(direction, frames, orient)
     end
 end
 
+-- Ick ... this is way too thread unsafe for my liking. Unfortunately, I can't
+-- think of a cleaner place to story this that's accessible to bullets.
+patterns.last_fire_direction = 0
 function patterns.fire(...)
     local bullets = arg
     return function(action)
@@ -328,6 +346,7 @@ function patterns.fire(...)
                         self.action.bullet.target
                     )
 
+                    patterns.last_fire_direction = new_bullet.direction
                     self.action.bullet.child_created(new_bullet)
                 end
             end
