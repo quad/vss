@@ -1,6 +1,5 @@
 require 'bad'
 require 'boom'
-require 'bullet'
 require 'ship'
 require 'wave'
 
