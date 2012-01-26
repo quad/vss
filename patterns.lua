@@ -101,6 +101,10 @@ function drawable(bullet)
         love.graphics.rectangle('fill', self.bullet.x, self.bullet.y, 5, 5)
 
         love.graphics.setColor(r, g, b, a)
+
+        if self:is_offscreen() then
+            self.dead = true
+        end
     end
 
     function d:box()
@@ -110,6 +114,12 @@ function drawable(bullet)
             width = 10,
             height = 10 
         }
+    end
+
+    function d:is_offscreen()
+        return self.bullet.x < 0 or self.bullet.y < 0
+            or self.bullet.y > love.graphics.getHeight()
+            or self.bullet.x > love.graphics.getWidth()
     end
 
     return d
