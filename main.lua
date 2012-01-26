@@ -154,12 +154,12 @@ function love.update(dt)
 
     if table.maxn(bullets_baddies) == 0 then
         local b = bullet(0, 3, 
-            change_direction(-math.pi / 4, 10, "absolute"),
+            change_direction(math.pi / 4, 10, "absolute"),
             wait(30),
             loop(3,
                 fire(
-                    bullet(0, 6, 
-                        change_direction(0.5 + math.pi / 2, 10, "absolute")
+                    bullet(0, 1, 
+                        change_direction(0.5 + math.pi / 2, 50, "aim")
                     )
                 ),
                 wait(20)
@@ -176,9 +176,9 @@ function love.update(dt)
             table.insert(bullets_baddies, drawable(child))
         end
 
-        table.insert(bullets_baddies, drawable(b(300, 100, c)))
-        table.insert(bullets_baddies, drawable(b(250, 200, c)))
-        table.insert(bullets_baddies, drawable(b(150, 250, c)))
+        table.insert(bullets_baddies, drawable(b(300, 100, c, ship)))
+        table.insert(bullets_baddies, drawable(b(250, 200, c, ship)))
+        table.insert(bullets_baddies, drawable(b(150, 250, c, ship)))
     end
 
     local d = ""

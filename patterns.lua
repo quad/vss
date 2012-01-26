@@ -88,7 +88,7 @@ end
 function patterns.bullet(direction, speed, ...)
     local body = action(...)
 
-    return function(x, y, child_created)
+    return function(x, y, child_created, target)
         local b = {
             x = x,
             y = y,
@@ -96,7 +96,8 @@ function patterns.bullet(direction, speed, ...)
             speed = speed,
             mx = 0,
             my = 0,
-            child_created = child_created
+            child_created = child_created,
+            target = target
         }
 
         b.body = body(b)
@@ -220,6 +221,29 @@ function patterns.change_speed(speed, frames)
 end
 
 function patterns.change_direction(direction, frames, orient)
+    function aim(cd)
+        function cd:_advance()
+            local remaining = self.frames - self.current
+
+            local opposite = self.action.bullet.x - self.action.bullet.target.x
+            local adjacent = self.action.bullet.y - self.action.bullet.target.y
+            local theta = math.atan(opposite / adjacent)
+
+            if remaining > 0 then 
+                local start = self.action.bullet.direction
+
+                local total_change = (theta - start)
+                total_change = (total_change + math.pi) % (2 * math.pi) - math.pi
+
+                local delta = total_change / remaining
+
+                self.action.bullet.direction = self.action.bullet.direction + delta
+            end
+        end
+
+        return cd
+    end
+
     function relative(cd)
         cd.delta_per_step = cd.target / cd.frames
 
@@ -273,6 +297,8 @@ function patterns.change_direction(direction, frames, orient)
             return relative(cd)
         elseif cd.orient == "absolute" then
             return absolute(cd)
+        elseif cd.orient == "aim" then
+            return aim(cd)
         end
     end
 end
@@ -291,7 +317,12 @@ function patterns.fire(...)
                 self.fired = true
 
                 for i, b in ipairs(self.bullets) do
-                    local new_bullet = b(self.action.bullet.x, self.action.bullet.y)
+                    local new_bullet = b(
+                        self.action.bullet.x, 
+                        self.action.bullet.y, 
+                        self.action.bullet.child_created,
+                        self.action.bullet.target
+                    )
 
                     self.action.bullet.child_created(new_bullet)
                 end
