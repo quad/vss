@@ -16,6 +16,8 @@ local function action(...)
         a.children = _children
 
         function a:advance()
+            self.blocking = false
+
             local finished = {}
 
             for i, child in ipairs(self.children) do
@@ -27,6 +29,7 @@ local function action(...)
                 end
 
                 if child.blocking and not done then
+                    self.blocking = true
                     break
                 elseif done then
                     table.insert(finished, i)
@@ -93,25 +96,25 @@ function patterns.bullet(direction, speed, ...)
     local body = action(...)
 
     return function(x, y, child_created, target)
-        print("making bullet")
+        local _direction = direction
         if type(direction) == "table" then
             local dir, orient = unpack(direction)
 
             if orient == "sequence" then
-                direction = patterns.last_fire_direction + dir
+                _direction = patterns.last_fire_direction + dir
             elseif orient == "aim" then
                 local opposite = x - target.x
                 local adjacent = y - target.y
-                direction = math.atan(opposite / adjacent) + dir
+                _direction = math.atan(opposite / adjacent) + dir
             else
-                direction = dir
+                _direction = dir
             end
         end
 
         local b = {
             x = x,
             y = y,
-            direction = direction,
+            direction = _direction,
             speed = speed,
             mx = 0,
             my = 0,
@@ -366,29 +369,35 @@ function patterns.loop(count, ...)
     return function(action)
         local l = {
             action = action,
-            count = count,
-            generator = generator,
-            childe = nil,
-            current = 0
+            count = count
         }
 
+        l.children = {}
+        for i=1,count do
+            table.insert(l.children, generator(l.action.bullet))
+        end
+
         function l:advance()
-            if not self:done() then
-                if not self.child then
-                    self.child = generator(self.action.bullet)
-                end
+            local dead = {}
+            for i, c in ipairs(self.children) do
+                if not c:done() then
+                    c:advance()
 
-                self.child:advance()
-
-                if self.child:done() then
-                    self.child = nil
-                    self.current = self.current + 1
+                    if c:done() then
+                        table.insert(dead, i)
+                    elseif c.blocking then
+                        break
+                    end
                 end
+            end
+
+            for i_dead=#dead,1,-1 do
+                table.remove(self.children, dead[i_dead])
             end
         end
 
         function l:done()
-            return self.current >= self.count
+            return table.maxn(self.children) <= 0
         end
 
         return l
