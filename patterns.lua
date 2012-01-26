@@ -52,6 +52,10 @@ function patterns.drawable(bullet)
 
     function d:advance()
         self.bullet:advance()
+
+        if not self.dead and self.bullet.dead then
+            self.dead = true
+        end
     end
 
     function d:draw()
