@@ -146,20 +146,34 @@ function love.update(dt)
     require 'patterns'
 
     if table.maxn(bullets_baddies) == 0 then
-        local b = bullet(300, 100, 0, 3, action(
-            --change_direction(-math.pi / 4, 50, "absolute")
+        local b = bullet(0, 3, 
+            change_direction(-math.pi / 4, 10, "absolute"),
             wait(30),
-            vanish()
-        ))
+            loop(3,
+                fire(
+                    bullet(0, 6, 
+                        change_direction(math.pi / 2, 10, "absolute"),
+                        wait(15),
+                        change_direction(math.pi / 4, 30, "relative")
+                    )
+                ),
+                wait(20)
+            )
+        )
 
-        local b2 = bullet(400, 100, 0, 3, action(
-            --change_direction(-math.pi / 4, 50, "absolute")
-            wait(30),
+        local b2 = bullet(0, 3, 
+            change_direction(math.pi / 4, 10, "absolute"),
+            wait(100),
             vanish()
-        ))
+        )
 
-        table.insert(bullets_baddies, b)
-        table.insert(bullets_baddies, b2)
+        function c(child)
+            table.insert(bullets_baddies, drawable(child))
+        end
+
+        table.insert(bullets_baddies, drawable(b(300, 100, c)))
+        table.insert(bullets_baddies, drawable(b(250, 200, c)))
+        table.insert(bullets_baddies, drawable(b(150, 250, c)))
     end
 
     local d = ""

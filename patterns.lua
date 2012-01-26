@@ -86,25 +86,34 @@ function patterns.Bullet:done()
     return self.body:done()
 end
 
--- TODO: Move this somewhere else. This bullet should only be a model, not a display
-    function patterns.Bullet:draw()
+-- TODO: This should move all to another module
+function drawable(bullet)
+    local d = {bullet = bullet}
+
+    function d:advance()
+        self.bullet:advance()
+    end
+
+    function d:draw()
         local r, g, b, a = love.graphics.getColor()
 
         love.graphics.setColor(174, 0, 68)
-        love.graphics.rectangle('fill', self.x, self.y, 5, 5)
+        love.graphics.rectangle('fill', self.bullet.x, self.bullet.y, 5, 5)
 
         love.graphics.setColor(r, g, b, a)
     end
 
-    function patterns.Bullet:box()
+    function d:box()
         return {
-            x = self.x - 5,
-            y = self.y - 5,
+            x = self.bullet.x - 5,
+            y = self.bullet.y - 5,
             width = 10,
             height = 10 
         }
     end
--- TODO: END
+
+    return d
+end
 
 function bullet(direction, speed, ...)
     local body = action(...)
