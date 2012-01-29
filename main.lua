@@ -224,9 +224,6 @@ function love.update()
         end
         table.insert(bullets_baddies, graphics.bullets.drawable(circle(math.random())(300, 100, c, ship)))
     end
-
-    local d = ""
-    if bullets_baddies[1].dead then d = "yup" else d = "nah" end
 end
 
 function love.keypressed(k)
