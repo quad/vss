@@ -110,6 +110,16 @@ function move(dt)
     end
 end
 
+function respawn()
+    ship = Ship:new(400, 300, joystick)
+
+    for i=#ships,1,-1 do
+        table.remove(ships, i)
+    end
+
+    table.insert(ships, ship)
+end
+
 function hit_ship()
     local dead = {}
 
@@ -125,6 +135,8 @@ function hit_ship()
             if ship.dead then
                 table.insert(booms, Boom:new(ship.x, ship.y))
                 sounds.ship_boom:play()
+
+                respawn()
             end
         end
     end
