@@ -37,6 +37,9 @@ local function base(width, height, model)
             or self.model.x > love.graphics.getWidth()
     end
 
+    function b:collide(other)
+    end
+
     return b
 end
 

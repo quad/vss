@@ -44,7 +44,8 @@ function Ship:box()
     }
 end
 
-function Ship:collide()
+function Ship:collide(other)
+    other.dead = true
     self.dead = true
 end
 
