@@ -49,7 +49,7 @@ local function action(...)
     end
 end
 
-function patterns.bullet(direction, speed, ...)
+local function mob(direction, speed, ...)
     local body = action(...)
 
     return function(x, y, child_created, target)
@@ -98,6 +98,14 @@ function patterns.bullet(direction, speed, ...)
 
         return b
     end
+end
+
+function patterns.bullet(direction, speed, ...)
+    return mob(direction, speed, ...)
+end
+
+function patterns.bad(direction, speed, ...)
+    return mob(direction, speed, ...)
 end
 
 function patterns.wait(ticks)
