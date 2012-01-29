@@ -1,10 +1,8 @@
-require 'bad'
 require 'boom'
 require 'ship'
-require 'wave'
 
     require 'graphics/bullets'
-    drawable = graphics.bullets.drawable
+    require 'graphics/baddies'
 
     require 'patterns'
 
@@ -14,6 +12,7 @@ require 'wave'
     loop = patterns.loop
     fire = patterns.fire
     vanish = patterns.vanish
+    bad = patterns.bad
 
 
 joystick = {
@@ -61,23 +60,13 @@ function love.joystickreleased(j, b)
     fire_everything = false
 end
 
-function fire_baddies()
-    for i_bad, bad in ipairs(baddies) do
-        for i_s, s in ipairs(bad.shots) do
-            table.insert(bullets_baddies, s)
-        end
-
-        bad.shots = {}
-    end
-end
-
 function fire_ship()
     if fire_everything then
         if sounds.player_shot:isStopped() then
             sounds.player_shot:play()
         end
 
-        local shot = drawable(bullet(math.pi, 15)(ship.x, ship.y))
+        local shot = graphics.bullets.drawable(bullet(math.pi, 15)(ship.x, ship.y))
         table.insert(bullets_ship, shot)
     elseif not sounds.player_shot:isStopped() then
         sounds.player_shot:stop()
@@ -190,7 +179,6 @@ function love.update(dt)
     hit_baddies()
 
     fire_ship()
-    fire_baddies()
 
     if table.maxn(bullets_baddies) == 0 then
         local step = 2 * math.pi / 18
@@ -210,11 +198,30 @@ function love.update(dt)
             )
         end
 
-        function c(child)
-            table.insert(bullets_baddies, drawable(child))
+        local goomba = function(dir)
+            if dir < 0.5 then
+                dir = dir * -math.pi / 2
+            else
+                dir = dir * math.pi / 2
+            end
+
+            return bad(dir, 1,
+                wait(50),
+                loop(100,
+                    wait(30),
+                    fire(bullet({0, "aim"}, 3))
+                )
+            )
         end
 
-        table.insert(bullets_baddies, drawable(circle(math.random())(300, 100, c, ship)))
+        function c(child)
+            table.insert(bullets_baddies, graphics.bullets.drawable(child))
+        end
+
+        for i=1,5 do
+            table.insert(baddies, graphics.baddies.drawable(goomba(math.random())(300, 50, c, ship)))
+        end
+        table.insert(bullets_baddies, graphics.bullets.drawable(circle(math.random())(300, 100, c, ship)))
     end
 
     local d = ""
