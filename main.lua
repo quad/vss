@@ -1,19 +1,18 @@
 require 'boom'
 require 'ship'
 
-    require 'graphics/bullets'
-    require 'graphics/baddies'
+require 'graphics/bullets'
+require 'graphics/baddies'
 
-    require 'patterns'
+require 'patterns'
 
-    bullet = patterns.bullet
-    wait = patterns.wait
-    change_direction = patterns.change_direction
-    loop = patterns.loop
-    fire = patterns.fire
-    vanish = patterns.vanish
-    bad = patterns.bad
-
+bullet = patterns.bullet
+wait = patterns.wait
+change_direction = patterns.change_direction
+loop = patterns.loop
+fire = patterns.fire
+vanish = patterns.vanish
+bad = patterns.bad
 
 joystick = {
     n = 0,
@@ -172,7 +171,9 @@ end
 
 last_spawn = 0
 
-function love.update(dt)
+function love.update()
+    local dt = 1 / 120
+
     move(dt)
 
     hit_ship()
@@ -218,7 +219,7 @@ function love.update(dt)
             table.insert(bullets_baddies, graphics.bullets.drawable(child))
         end
 
-        for i=1,5 do
+        for i=1,20 do
             table.insert(baddies, graphics.baddies.drawable(goomba(math.random())(300, 50, c, ship)))
         end
         table.insert(bullets_baddies, graphics.bullets.drawable(circle(math.random())(300, 100, c, ship)))
@@ -226,63 +227,11 @@ function love.update(dt)
 
     local d = ""
     if bullets_baddies[1].dead then d = "yup" else d = "nah" end
-
---     last_spawn = last_spawn - dt
--- 
---     if last_spawn < 0 then
---         last_spawn = 1
--- 
---         local w = Wave:new()
---         for _, b in ipairs(w:spawn()) do
---             table.insert(baddies, b)
---         end
---     end
 end
 
 function love.keypressed(k)
     if k == 'escape' or k == 'q' then
         love.event.push('q')
-    end
-end
-
-function fps()
-    local sum = 0.0
-    for i, v in ipairs(recent_frame_times) do
-        sum = sum + v
-    end
-
-    local avg_frame_time= sum / table.maxn(recent_frame_times)
-    return math.floor(1 / avg_frame_time)
-end
-
-function love.run()
-    love.load(arg)
-
-    while true do
-        local now = love.timer.getMicroTime()
-
-        love.update(1 / 60)
-        love.graphics.clear()
-        love.draw()
-        love.graphics.present()
-
-        -- Process events.
-        for e,a,b,c in love.event.poll() do
-            if e == "q" then
-                if not love.quit or not love.quit() then
-                    if love.audio then
-                        love.audio.stop()
-                    end
-                    return
-                end
-            end
-            love.handlers[e](a,b,c)
-        end
-
-        table.insert(recent_frame_times, love.timer.getMicroTime() - now)
-        if table.maxn(recent_frame_times) > 100 then
-            table.remove(recent_frame_times, 1)
-        end
     end
 end
 
@@ -300,7 +249,7 @@ function love.draw()
 
     -- Draw the current FPS.
     print_objects(0, love.graphics.getHeight() - 30, 'All', all)
-    love.graphics.print("FPS: " .. fps(), 0, love.graphics.getHeight() - 15)
+    love.graphics.print("FPS: " .. love.timer.getFPS(), 0, love.graphics.getHeight() - 15)
 end
 
 function print_objects(x, y, title, objs)
